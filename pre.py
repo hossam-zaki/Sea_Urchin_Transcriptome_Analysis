@@ -4,14 +4,16 @@ import argparse
 from argparse import ArgumentParser
 
 class kmp:
-    def __init__(self, seqs, pattern):  
+    def __init__(self, seqs, pattern, cds):  
         self.pathToSeq = seqs
         self.pathToPattern = pattern
+        self.cds = cds
         self.pattern = None
         self.failure_fun = {}
         self.seq1 = None
         self.successArray = []
         self.seqsDict = {}
+        self.cdsDict = {}
     def failure_function(self):
         self.failure_fun[0] = 0
         i = 0
@@ -23,32 +25,34 @@ class kmp:
                 self.failure_fun[j] = 0
             else:
                 self.failure_fun[j] = i+1
-    def retrieve_seqs(self):
+    def retrieve_pattern(self):
         with open(self.pathToPattern) as file:
             for line in file:
                 self.pattern = line.strip()
-        with open(self.pathToSeq) as f:
+    def retrieve_seqs(self, seqs, dict, boolean1):
+        with open(seqs) as f:
             boolean = False
             label = None
             string = ""
             for line in f:
-                matches = re.match(r">(.*)-", line)
+                if boolean1:
+                    matches = re.match(r">(.*)-mrna", line)
+                else:
+                    matches = re.match(r">(.*)-cds", line)
                 if matches != None:
                     boolean = True
                     label = matches[1]
                     continue
                 if not line.strip():
-                    print("yee")
                     boolean = False
-                    self.seqsDict[label] = string
+                    dict[label] = string
                     label = None
                     string = ""
                     continue
                 if boolean == True:
                     string += line.strip()
                     continue
-    def retrives_cds(self):
-
+        return dict
     def kmpsearching(self, seq):
         patInd = 0
         textInd = 0
@@ -75,19 +79,22 @@ class kmp:
             return (self.successArray)
         
     def kmp(self):
-        self.retrieve_seqs()  
+        self.retrieve_pattern()
+        self.seqsDict = self.retrieve_seqs(self.pathToSeq, self.seqsDict, True)
+        self.cdsDict = self.retrieve_seqs(self.cds, self.cdsDict, False) 
+        print(self.cdsDict)
+        print(self.seqsDict)
         self.failure_function()
         for i in self.seqsDict:
-            print(self.kmpsearching(self.seqsDict[i]), i)
             if (self.kmpsearching(self.seqsDict[i])) != -1:
                 with open("failure.txt", "a+") as f:
                     f.write(i + "\n")
-        print(self.failure_fun)
+                    print(self.kmpsearching(self.cdsDict[i]))
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument('--seqs',type=str,required=True)
     parser.add_argument('--pattern',type=str,required=True)
-    #parser.add_argument('--cds', type=str, required=True)
+    parser.add_argument('--cds', type=str, required=True)
     config = parser.parse_args()
-    kmp = kmp(config.seqs, config.pattern)
+    kmp = kmp(config.seqs, config.pattern, config.cds)
     kmp.kmp()
