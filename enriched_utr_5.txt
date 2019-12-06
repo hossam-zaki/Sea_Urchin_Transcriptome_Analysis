@@ -1,0 +1,5 @@
+WHL22.372217.0 has 1 PRE element's in 5' utr 
+WHL22.372217.2 has 1 PRE element's in 5' utr 
+WHL22.372217.1 has 1 PRE element's in 5' utr 
+WHL22.502025.0 has 2 PRE element's in 5' utr 
+WHL22.502025.3 has 2 PRE element's in 5' utr 

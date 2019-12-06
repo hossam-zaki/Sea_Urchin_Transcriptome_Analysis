@@ -14,14 +14,16 @@ class kmp:
         self.successArray = []
         self.seqsDict = {}
         self.cdsDict = {}
-    def failure_function(self):
+        self.foundSeqs = []
+    def failure_function(self, pattern):
+        self.failure_fun={}
         self.failure_fun[0] = 0
         i = 0
-        for j in range (1, len(self.pattern)):
+        for j in range (1, len(pattern)):
             i = self.failure_fun[j-1]
-            while self.pattern[j] != self.pattern[i] and i > 0:
+            while pattern[j] != pattern[i] and i > 0:
                 i = self.failure_fun[i-1]
-            if self.pattern[j] != self.pattern[i] and i==0:
+            if pattern[j] != pattern[i] and i==0:
                 self.failure_fun[j] = 0
             else:
                 self.failure_fun[j] = i+1
@@ -53,20 +55,20 @@ class kmp:
                     string += line.strip()
                     continue
         return dict
-    def kmpsearching(self, seq):
+    def kmpsearching(self, seq, pattern):
         patInd = 0
         textInd = 0
         lenSeq = len(seq)
-        lenPattern = len(self.pattern)
+        lenPattern = len(pattern)
         self.successArray = []
         while lenSeq > textInd:
-            if self.pattern[patInd] == seq[textInd]:
+            if pattern[patInd] == seq[textInd]:
                 patInd = patInd + 1
                 textInd = textInd + 1
                 if patInd == lenPattern:
                     self.successArray.append(textInd - lenPattern)
                     patInd = self.failure_fun[patInd-1]
-            if textInd < lenSeq and self.pattern[patInd] is not seq[textInd]:
+            if textInd < lenSeq and pattern[patInd] is not seq[textInd]:
                 if patInd != 0:
                     patInd = self.failure_fun[patInd-1]
                 else:
@@ -82,13 +84,40 @@ class kmp:
         self.retrieve_pattern()
         self.seqsDict = self.retrieve_seqs(self.pathToSeq, self.seqsDict, True)
         self.cdsDict = self.retrieve_seqs(self.cds, self.cdsDict, False) 
-        self.failure_function()
+        self.failure_function(self.pattern)
         for i in self.seqsDict:
-            ind = self.kmpsearching(self.seqsDict[i])
+            ind = self.kmpsearching(self.seqsDict[i], self.pattern)
             if (ind) != -1:
-                if self.kmpsearching(self.cdsDict[i]) == -1:
-                    with open("enriched.txt", "a+") as f:
+                if self.kmpsearching(self.cdsDict[i], self.pattern) == -1:
+                    self.foundSeqs.append((i, ind))
+                    with open("depleted.txt", "a+") as f:
                         f.write(f"{i}, {ind} \n")  
+        for j in self.foundSeqs:
+            self.failure_function(self.cdsDict[j[0]])
+            start = self.kmpsearching(self.seqsDict[j[0]], self.cdsDict[j[0]])
+            end = start + len(self.cdsDict[j[0]])
+            counter_3 = 0
+            counter_5 = 0
+            if type(j[1]) == list:
+                for ind in j[1]:
+                    if ind < start:
+                        counter_5 +=1
+                    if ind > end:
+                        counter_3 +=1
+            else:
+                if j[1] < start:
+                    counter_5 +=1
+                if j[1] > end:
+                    counter_3 +=1
+            if counter_5 > 0:
+                with open("depleted_utr_5.txt", "a+") as file:
+                    file.write(f"{j[0]} has {counter_5} PRE element's in 5' utr \n")  
+            if counter_3 > 0:
+                with open("depleted_utr_3.txt", "a+") as file:
+                    file.write(f"{j[0]} has {counter_3} PRE element's in 3' utr \n")
+
+
+
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument('--seqs',type=str,required=True)
