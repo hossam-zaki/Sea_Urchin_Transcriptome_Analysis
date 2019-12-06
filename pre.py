@@ -86,9 +86,9 @@ class kmp:
         for i in self.seqsDict:
             ind = self.kmpsearching(self.seqsDict[i])
             if (ind) != -1:
-                    if self.kmpsearching(self.cdsDict[i]) != -1:
-                        with open("depleted.txt", "a+") as f:
-                            f.write(f"{i}, {ind} \n")  
+                if self.kmpsearching(self.cdsDict[i]) == -1:
+                    with open("enriched.txt", "a+") as f:
+                        f.write(f"{i}, {ind} \n")  
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument('--seqs',type=str,required=True)
