@@ -82,14 +82,13 @@ class kmp:
         self.retrieve_pattern()
         self.seqsDict = self.retrieve_seqs(self.pathToSeq, self.seqsDict, True)
         self.cdsDict = self.retrieve_seqs(self.cds, self.cdsDict, False) 
-        print(self.cdsDict)
-        print(self.seqsDict)
         self.failure_function()
         for i in self.seqsDict:
-            if (self.kmpsearching(self.seqsDict[i])) != -1:
-                with open("failure.txt", "a+") as f:
-                    f.write(i + "\n")
-                    print(self.kmpsearching(self.cdsDict[i]))
+            ind = self.kmpsearching(self.seqsDict[i])
+            if (ind) != -1:
+                    if self.kmpsearching(self.cdsDict[i]) != -1:
+                        with open("depleted.txt", "a+") as f:
+                            f.write(f"{i}, {ind} \n")  
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument('--seqs',type=str,required=True)
