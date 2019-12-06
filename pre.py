@@ -15,6 +15,8 @@ class kmp:
         self.seqsDict = {}
         self.cdsDict = {}
         self.foundSeqs = []
+        self.seqs5 = []
+        self.seqs3 = []
     def failure_function(self, pattern):
         self.failure_fun={}
         self.failure_fun[0] = 0
@@ -90,7 +92,7 @@ class kmp:
             if (ind) != -1:
                 if self.kmpsearching(self.cdsDict[i], self.pattern) == -1:
                     self.foundSeqs.append((i, ind))
-                    with open("depleted.txt", "a+") as f:
+                    with open("enriched.txt", "a+") as f:
                         f.write(f"{i}, {ind} \n")  
         for j in self.foundSeqs:
             self.failure_function(self.cdsDict[j[0]])
@@ -110,11 +112,17 @@ class kmp:
                 if j[1] > end:
                     counter_3 +=1
             if counter_5 > 0:
-                with open("depleted_utr_5.txt", "a+") as file:
-                    file.write(f"{j[0]} has {counter_5} PRE element's in 5' utr \n")  
+                self.seqs5.append((j[0], counter_5))
             if counter_3 > 0:
-                with open("depleted_utr_3.txt", "a+") as file:
-                    file.write(f"{j[0]} has {counter_3} PRE element's in 3' utr \n")
+                self.seqs3.append((j[0], counter_3))
+        self.seqs5.sort(key=lambda tup: tup[1], reverse=True)
+        self.seqs3.sort(key=lambda tup: tup[1], reverse=True)
+        for k in self.seqs5:
+            with open("enriched_utr_5.txt", "a+") as file:
+                file.write(f"{k[0]} has {k[1]} PRE element's in 5' utr \n") 
+        for l in self.seqs3:
+            with open("enriched_utr_3.txt", "a+") as file:
+                file.write(f"{l[0]} has {l[1]} PRE element's in 3' utr \n") 
 
 
 
