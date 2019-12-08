@@ -1,6 +1,7 @@
 import sys
 import re
 import argparse
+import operator
 from argparse import ArgumentParser
 
 class kmp:
@@ -92,7 +93,7 @@ class kmp:
             if (ind) != -1:
                 if self.kmpsearching(self.cdsDict[i], self.pattern) == -1:
                     self.foundSeqs.append((i, ind))
-                    with open("enriched.txt", "a+") as f:
+                    with open("depleted.txt", "a+") as f:
                         f.write(f"{i}, {ind} \n")  
         for j in self.foundSeqs:
             self.failure_function(self.cdsDict[j[0]])
@@ -118,12 +119,47 @@ class kmp:
         self.seqs5.sort(key=lambda tup: tup[1], reverse=True)
         self.seqs3.sort(key=lambda tup: tup[1], reverse=True)
         for k in self.seqs5:
-            with open("enriched_utr_5.txt", "a+") as file:
+            with open("depleted_utr_5.txt", "a+") as file:
                 file.write(f"{k[0]} has {k[1]} PRE element's in 5' utr \n") 
         for l in self.seqs3:
-            with open("enriched_utr_3.txt", "a+") as file:
+            with open("depleted_utr_3.txt", "a+") as file:
                 file.write(f"{l[0]} has {l[1]} PRE element's in 3' utr \n") 
-
+    def find_motif(self):
+        for i in range(1, 15):
+            kmers = {}
+            seqs_vals_list = []
+            for j in self.seqs3:
+                self.failure_function(self.cdsDict[j[0]])
+                start = self.kmpsearching(self.seqsDict[j[0]], self.cdsDict[j[0]])
+                end = start + len(self.cdsDict[j[0]])
+                string = self.seqsDict[j[0]][end:len(self.seqsDict[j[0]])]
+                for l in range (0, len(string)):
+                    if string[l: (l + i)] in kmers:
+                        kmers[string[l: (l + i)]] += 1
+                        continue
+                    elif len(string[l: (l + i)]) != i:
+                        continue
+                    else: 
+                        kmers[string[l: (l + i)]] = 1
+            for m in kmers:
+                seqs_vals_list.append((m, kmers[m]))
+            seqs_vals_list.sort(key=lambda tup: tup[1], reverse=True)
+            print(i)
+            for val in range(int(len(seqs_vals_list)/3), int(len(seqs_vals_list)/2)):
+                seq = seqs_vals_list[val][0]
+                self.failure_function(seq)
+                counter = 0
+                lis = []
+                for h in self.seqs3:
+                    if self.kmpsearching(self.seqsDict[h[0]], seq) != -1:
+                        counter += 1
+                        lis.append(h[0])
+                print(seq, counter)
+            # for h in self.seqs3:
+            #     if self.kmpsearching(self.seqsDict[h[0]], maxi) != -1:
+            #         counter += 1
+            #         lis.append(h[0])
+            # print(maxi, counter)
 
 
 if __name__ == "__main__":
@@ -134,3 +170,5 @@ if __name__ == "__main__":
     config = parser.parse_args()
     kmp = kmp(config.seqs, config.pattern, config.cds)
     kmp.kmp()
+    #kmp.find_motif()
+    #print(kmp.kmpsearching(kmp.seqsDict['WHL22.504363.1'], 'TCTCTCTCTCTCTCTCTCT'))
