@@ -93,7 +93,7 @@ class kmp:
             if (ind) != -1:
                 if self.kmpsearching(self.cdsDict[i], self.pattern) == -1:
                     self.foundSeqs.append((i, ind))
-                    with open("depleted.txt", "a+") as f:
+                    with open("enriched.txt", "a+") as f:
                         f.write(f"{i}, {ind} \n")  
         for j in self.foundSeqs:
             self.failure_function(self.cdsDict[j[0]])
@@ -118,14 +118,16 @@ class kmp:
                 self.seqs3.append((j[0], counter_3))
         self.seqs5.sort(key=lambda tup: tup[1], reverse=True)
         self.seqs3.sort(key=lambda tup: tup[1], reverse=True)
-        for k in self.seqs5:
-            with open("depleted_utr_5.txt", "a+") as file:
-                file.write(f"{k[0]} has {k[1]} PRE element's in 5' utr \n") 
-        for l in self.seqs3:
-            with open("depleted_utr_3.txt", "a+") as file:
-                file.write(f"{l[0]} has {l[1]} PRE element's in 3' utr \n") 
+        #for k in self.seqs5:
+        #    with open("depleted_utr_5.txt", "a+") as file:
+        #        file.write(f"{k[0]} has {k[1]} PRE element's in 5' utr \n") 
+        #for l in self.seqs3:
+        #    with open("depleted_utr_3.txt", "a+") as file:
+        #        file.write(f"{l[0]} has {l[1]} PRE element's in 3' utr \n") 
     def find_motif(self):
-        for i in range(1, 15):
+        for i in range(4, 10):
+            with open("enriched_most_common_kmers.txt", "a+") as file:
+                file.write(f"Length of k-mer = {i} \n")
             kmers = {}
             seqs_vals_list = []
             for j in self.seqs3:
@@ -144,17 +146,21 @@ class kmp:
             for m in kmers:
                 seqs_vals_list.append((m, kmers[m]))
             seqs_vals_list.sort(key=lambda tup: tup[1], reverse=True)
-            print(i)
-            for val in range(int(len(seqs_vals_list)/3), int(len(seqs_vals_list)/2)):
+            lis = []
+            for val in range(0, 20):
                 seq = seqs_vals_list[val][0]
                 self.failure_function(seq)
                 counter = 0
-                lis = []
                 for h in self.seqs3:
                     if self.kmpsearching(self.seqsDict[h[0]], seq) != -1:
                         counter += 1
-                        lis.append(h[0])
+                lis.append((seq, counter))
                 print(seq, counter)
+                
+            lis.sort(key=lambda tup: tup[1], reverse=True)
+            for q in range(0, len(lis)):
+                with open("enriched_most_common_kmers.txt", "a+") as fi:
+                    fi.write(f"kmer: {lis[q][0]} appears: {lis[q][1]} out of {len(self.foundSeqs)} \n")
             # for h in self.seqs3:
             #     if self.kmpsearching(self.seqsDict[h[0]], maxi) != -1:
             #         counter += 1
@@ -170,5 +176,5 @@ if __name__ == "__main__":
     config = parser.parse_args()
     kmp = kmp(config.seqs, config.pattern, config.cds)
     kmp.kmp()
-    #kmp.find_motif()
+    kmp.find_motif()
     #print(kmp.kmpsearching(kmp.seqsDict['WHL22.504363.1'], 'TCTCTCTCTCTCTCTCTCT'))
