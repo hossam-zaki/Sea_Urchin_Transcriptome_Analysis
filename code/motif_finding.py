@@ -3,10 +3,10 @@ import re
 import argparse
 import operator
 from argparse import ArgumentParser
-from knuthMorrisPratt import kmpSearch
+from KnuthMorrisPratt import *
 
 class motifFinding:
-    def __init__(self, seqs, pattern, cds, boolean):  
+    def __init__(self, seqs, pattern, cds, enriched):  
         self.pathToSeq = seqs
         self.pathToPattern = pattern
         self.cds = cds
@@ -17,7 +17,7 @@ class motifFinding:
         self.foundSeqs = []
         self.seqs5 = []
         self.seqs3 = []
-        if boolean == True:
+        if enriched == "True":
             self.classification = "enriched"
         else:
             self.classification = "depleted"
@@ -25,7 +25,6 @@ class motifFinding:
         with open(self.pathToPattern) as file:
             for line in file:
                 self.pattern = line.strip()
-
     def retrieve_seqs(self, seqs, dict, boolean1):
         with open(seqs) as f:
             boolean = False
@@ -55,12 +54,12 @@ class motifFinding:
         self.seqsDict = self.retrieve_seqs(self.pathToSeq, self.seqsDict, True)
         self.cdsDict = self.retrieve_seqs(self.cds, self.cdsDict, False) 
         for i in self.seqsDict:
-            ind = kmpSearch.kmpMatching(self.seqsDict[i], self.pattern)
+            ind = kmpMatching(self.seqsDict[i], self.pattern)
             if ind != -1:
-                if kmpSearch.kmpMatching(self.cdsDict[i], self.pattern) == -1:
+                if kmpMatching(self.cdsDict[i], self.pattern) == -1:
                     self.foundSeqs.append((i, ind))
         for j in self.foundSeqs:
-            start = kmpSearch.kmpMatching(self.seqsDict[j[0]], self.cdsDict[j[0]])
+            start = kmpMatching(self.seqsDict[j[0]], self.cdsDict[j[0]])
             end = start + len(self.cdsDict[j[0]])
             counter_3 = 0
             counter_5 = 0
@@ -82,19 +81,19 @@ class motifFinding:
         self.seqs5.sort(key=lambda tup: tup[1], reverse=True)
         self.seqs3.sort(key=lambda tup: tup[1], reverse=True)
         for k in self.seqs5:
-            with open(f"{self.classification}_utr_5.txt", "a+") as file:
+            with open(f"../results/{self.classification}_utr_5.txt", "a+") as file:
                 file.write(f"{k[0]} has {k[1]} PRE element's in 5' utr \n") 
         for l in self.seqs3:
-            with open(f"{self.classification}_utr_3.txt", "a+") as file:
+            with open(f"../results/{self.classification}_utr_3.txt", "a+") as file:
                 file.write(f"{l[0]} has {l[1]} PRE element's in 3' utr \n") 
     def find_motif(self):
         for i in range(4, 16):
-            with open(f"{self.classification}_most_common_kmers.txt", "a+") as file:
+            with open(f"../results/{self.classification}_most_common_kmers.txt", "a+") as file:
                 file.write(f"Length of k-mer = {i} \n")
             kmers = {}
             seqs_vals_list = []
             for j in self.seqs3:
-                start = kmpSearch.kmpMatching(self.seqsDict[j[0]], self.cdsDict[j[0]])
+                start = kmpMatching(self.seqsDict[j[0]], self.cdsDict[j[0]])
                 end = start + len(self.cdsDict[j[0]])
                 string = self.seqsDict[j[0]][end:len(self.seqsDict[j[0]])]
                 for l in range (0, len(string)):
@@ -115,16 +114,15 @@ class motifFinding:
                 seq = seqs_vals_list[val][0]
                 counter = 0
                 for h in self.seqs3:
-                    start = kmpSearch.kmpMatching(self.seqsDict[h[0]], self.cdsDict[h[0]])
+                    start = kmpMatching(self.seqsDict[h[0]], self.cdsDict[h[0]])
                     end = start + len(self.cdsDict[h[0]])
-                    string = self.seqsDict[h[0]][end:len(self.seqsDict[j[0]])]
-                    if kmpSearch.kmpMatching(string, seq) != -1:
+                    string = self.seqsDict[h[0]][end:len(self.seqsDict[h[0]])]
+                    if kmpMatching(string, seq) != -1:
                         counter += 1
                 lis.append((seq, counter))
-                print(seq, counter)
             lis.sort(key=lambda tup: tup[1], reverse=True)
             for q in range(0, len(lis)):
-                with open(f"{self.classification}_most_common_kmers.txt", "a+") as fi:
+                with open(f"../results/{self.classification}_most_common_kmers.txt", "a+") as fi:
                     fi.write(f"kmer: {lis[q][0]} appears: {lis[q][1]} out of {len(self.seqs3)} \n")
 
 
@@ -134,7 +132,7 @@ if __name__ == "__main__":
     parser.add_argument('--seqs',type=str,required=True)
     parser.add_argument('--pattern',type=str,required=True)
     parser.add_argument('--cds', type=str, required=True)
-    parser.add_argument('--enriched', type=bool, required=True)
+    parser.add_argument('--enriched', type=str, required=True)
     config = parser.parse_args()
     kmp = motifFinding(config.seqs, config.pattern, config.cds, config.enriched)
     kmp.searchForMotif()
