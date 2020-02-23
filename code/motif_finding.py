@@ -120,6 +120,7 @@ class motifFinding:
                     if kmpMatching(string, seq) != -1:
                         counter += 1
                 lis.append((seq, counter))
+                print((seq, counter))
             lis.sort(key=lambda tup: tup[1], reverse=True)
             for q in range(0, len(lis)):
                 with open(f"../results/{self.classification}_most_common_kmers.txt", "a+") as fi:
