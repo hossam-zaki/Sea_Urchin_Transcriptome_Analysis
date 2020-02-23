@@ -104,8 +104,6 @@ class motifFinding:
                         continue
                     else: 
                         kmers[string[l: (l + i)]] = 1
-                    #if (string[l: (l + i)]) == "TGTAAAT":
-                    #    quit()
             for m in kmers:
                 seqs_vals_list.append((m, kmers[m]))
             seqs_vals_list.sort(key=lambda tup: tup[1], reverse=True)
