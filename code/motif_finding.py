@@ -5,6 +5,7 @@ import operator
 from argparse import ArgumentParser
 from KnuthMorrisPratt import *
 
+
 class motifFinding:
     def __init__(self, seqs, pattern, cds, enriched):  
         self.pathToSeq = seqs
@@ -48,6 +49,7 @@ class motifFinding:
                 if boolean == True:
                     string += line.strip()
                     continue
+        
         return dict 
     def searchForMotif(self):
         self.retrieve_pattern()
