@@ -3,8 +3,7 @@ import re
 import argparse
 import operator 
 from argparse import ArgumentParser
-import KnuthMorrisPratt
-import PyPDF2
+import knuthMorrisPratt
 import local_align
 
 class miRNASearch:
