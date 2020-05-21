@@ -1,23 +1,25 @@
-import sys
-import re
 import argparse
 import operator
+import re
+import sys
 from argparse import ArgumentParser
 
 
 def computeFailureFunction(pattern):
-    failure_fun={}
+    failure_fun = {}
     failure_fun[0] = 0
     i = 0
-    for j in range (1, len(pattern)):
+    for j in range(1, len(pattern)):
         i = failure_fun[j-1]
         while pattern[j] != pattern[i] and i > 0:
             i = failure_fun[i-1]
-        if pattern[j] != pattern[i] and i==0:
+        if pattern[j] != pattern[i] and i == 0:
             failure_fun[j] = 0
         else:
             failure_fun[j] = i+1
     return failure_fun
+
+
 def kmpMatching(seq, pattern):
     failure_fun = computeFailureFunction(pattern)
     patInd = 0
@@ -36,10 +38,10 @@ def kmpMatching(seq, pattern):
             if patInd != 0:
                 patInd = failure_fun[patInd-1]
             else:
-                textInd +=1
+                textInd += 1
     if len(successArray) == 1:
         return successArray[0]
-    else: 
+    else:
         if len(successArray) == 0:
             successArray = -1
         return successArray

@@ -2,3 +2,4 @@
 .vscode
 *.pyc
 *.out
+*.code-workspace
