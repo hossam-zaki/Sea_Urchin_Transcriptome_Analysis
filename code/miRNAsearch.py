@@ -147,7 +147,6 @@ class miRNASearch:
 
     def getComplement(self, sequence):
         returnedSeq = ""
-        print(sequence)
         for char in sequence:
             if char == 'u':
                 returnedSeq += "T"
@@ -157,7 +156,6 @@ class miRNASearch:
                 returnedSeq += "G"
             if char == 'c':
                 returnedSeq += "C"
-        print(len(returnedSeq))
         return returnedSeq
 
 
@@ -165,7 +163,7 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument('--seqs', type=str, required=True)
     parser.add_argument('--mirna', type=str, required=True)
-    parser.add_argument('--enriched', type=bool, action="store_true")
+    parser.add_argument('--enriched', action="store_true")
     config = parser.parse_args()
     kmp = miRNASearch(config.seqs, config.mirna, config.enriched)
     kmp.searchForMiRNA()
