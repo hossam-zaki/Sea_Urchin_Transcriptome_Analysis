@@ -112,7 +112,8 @@ class miRNASearch:
                         transcripttoMiRNA[seq].append(mirna)
                         transcriptMiRNACount[seq] += 1
                         miRNACount[mirna] += 1
-        miRNACount.sort(key=lambda tup: tup[1], reverse=True)
+        miRNACount = {k: v for k, v in sorted(
+            miRNACount.items(), key=lambda item: item[1])}
         with(open(miRNAtoTranscriptFile, "w+")) as f:
             f.write("-------------------miRNA counts------------------- \n")
             f.write("\n")
@@ -125,7 +126,8 @@ class miRNASearch:
             for miRNAinTranscript in miRNAtoTranscript:
                 f.write(
                     f"{miRNAinTranscript} binds to these sequences {miRNAtoTranscript[miRNAinTranscript]} \n")
-        transcriptMiRNACount.sort(key=lambda tup: tup[1], reverse=True)
+        transcriptMiRNACount = {k: v for k, v in sorted(
+            transcriptMiRNACount.items(), key=lambda item: item[1])}
         with(open(transcripttoMiRNAFile, "w+")) as f:
             f.write("-------------------Transcript counts------------------- \n")
             f.write("\n")
