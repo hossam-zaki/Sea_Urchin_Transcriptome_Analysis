@@ -9,9 +9,12 @@ import local_align
 
 
 class miRNASearch:
-    def __init__(self, seqsFile, miRNA, enriched):
+    def __init__(self, miRNA, enriched):
         self.enrichedBool = enriched
-        self.pathToSeq = seqsFile
+        if(self.enrichedBool):
+            self.pathToSeq = '../data/motifSearchData/enriched_sequences.txt'
+        else:
+            self.pathToSeq = '../data/motifSearchData/depleted_sequences.txt'
         self.pathToMiRNA = miRNA
         self.seqsDict = {}
         self.miRnaDict = {}
@@ -163,9 +166,8 @@ class miRNASearch:
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument('--seqs', type=str, required=True)
     parser.add_argument('--mirna', type=str, required=True)
     parser.add_argument('--enriched', action="store_true")
     config = parser.parse_args()
-    kmp = miRNASearch(config.seqs, config.mirna, config.enriched)
+    kmp = miRNASearch(config.mirna, config.enriched)
     kmp.searchForMiRNA()
